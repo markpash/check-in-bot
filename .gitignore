@@ -1,0 +1,6 @@
+/check-in-bot
+*.db
+*.db-wal
+*.db-shm
+frontend/node_modules/
+internal/checkinbot/frontend_dist/

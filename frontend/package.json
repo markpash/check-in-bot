@@ -1,0 +1,11 @@
+{
+  "name": "check-in-bot-frontend",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf ../internal/checkinbot/frontend_dist && mkdir -p ../internal/checkinbot/frontend_dist && bun build ./src/main.jsx --outdir ../internal/checkinbot/frontend_dist --minify --entry-naming='[name]-[hash].[ext]' && JS_FILE=$(basename ../internal/checkinbot/frontend_dist/main-*.js) && sed \"s|/main.js|/${JS_FILE}|\" ./index.html > ../internal/checkinbot/frontend_dist/index.html",
+    "dev": "mkdir -p ../internal/checkinbot/frontend_dist && cp ./index.html ../internal/checkinbot/frontend_dist/index.html && bun build ./src/main.jsx --outdir ../internal/checkinbot/frontend_dist --watch"
+  },
+  "dependencies": {
+    "preact": "^10.25.0"
+  }
+}

@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "check-in-bot.fullname" . }}
+  labels:
+    {{- include "check-in-bot.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "check-in-bot.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "check-in-bot.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "check-in-bot.serviceAccountName" . }}
+      containers:
+        - name: check-in-bot
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: CHECKIN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "check-in-bot.secretName" . }}
+                  key: CHECKIN_TOKEN
+            - name: CHECKIN_DB
+              value: /data/checkin.db
+            - name: CHECKIN_LISTEN
+              value: ":8080"
+            - name: CHECKIN_BASE_URL
+              value: {{ .Values.config.baseURL | quote }}
+            - name: CHECKIN_CHECKIN_SCHEDULE
+              value: {{ .Values.config.checkinSchedule | quote }}
+            {{- if .Values.config.adminId }}
+            - name: CHECKIN_ADMIN_ID
+              value: {{ .Values.config.adminId | quote }}
+            {{- end }}
+            - name: CHECKIN_DEV
+              value: {{ ternary "true" "false" .Values.config.dev | quote }}
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "check-in-bot.fullname" . }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
