@@ -9,6 +9,7 @@ const errorMessages = {
 
 export default function Login({ error }) {
   const [config, setConfig] = useState(null);
+  const message = error ? (errorMessages[error] || error) : null;
 
   useEffect(() => {
     fetch('/api/config').then(r => r.json()).then(setConfig).catch(() => {});
@@ -33,20 +34,23 @@ export default function Login({ error }) {
   }, [config]);
 
   return h('div', { class: 'login-page' },
-    h('h1', null, 'Check-In Bot Admin'),
-    error && h('p', { class: 'login-error' }, errorMessages[error] || error),
-    config && config.dev
-      ? h('div', null,
-          h('p', null, 'Dev mode is enabled. Click below to log in as the first admin.'),
-          h('button', {
-            class: 'primary',
-            style: { marginTop: '12px', padding: '10px 24px', fontSize: '16px' },
-            onClick: () => { window.location.href = '/auth/dev'; },
-          }, 'Dev Login'),
-        )
-      : h('div', null,
-          h('p', null, 'Log in with your Telegram account to continue.'),
-          h('div', { id: 'telegram-login' }, config ? null : 'Loading...'),
-        ),
+    h('div', { class: 'login-shell' },
+      h('section', { class: 'login-panel card' },
+        h('p', { class: 'eyebrow' }, config && config.dev ? 'Development' : 'Sign In'),
+        h('h2', null, 'Check-In Bot Admin'),
+        h('p', { class: 'login-copy' }, config && config.dev
+          ? 'Sign in as the first admin user in the database.'
+          : 'Log in with Telegram to continue.'),
+        message && h('p', { class: 'login-error' }, message),
+        config && config.dev
+          ? h('button', {
+              class: 'primary login-dev-button',
+              onClick: () => { window.location.href = '/auth/dev'; },
+            }, 'Dev Login')
+          : h('div', { class: 'login-widget-wrap' },
+              h('div', { id: 'telegram-login' }, config ? null : 'Loading...'),
+            ),
+      ),
+    ),
   );
 }

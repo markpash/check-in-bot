@@ -131,17 +131,7 @@ func handleTelegramCallback(cfg Config, db *sqlx.DB) http.HandlerFunc {
 			return
 		}
 
-		// Upsert user from Telegram data.
-		upsertUser(db, userID,
-			params["username"],
-			params["first_name"],
-			params["last_name"],
-			"",
-			false,
-			false,
-		)
-
-		// Check if user is admin.
+		// Check if the user is already known as an admin before mutating anything.
 		u, err := getUser(db, userID)
 		if err == sql.ErrNoRows || !u.IsAdmin {
 			http.Redirect(w, r, "/#/login?error=not_admin", http.StatusFound)
@@ -152,6 +142,16 @@ func handleTelegramCallback(cfg Config, db *sqlx.DB) http.HandlerFunc {
 			http.Error(w, "Internal error", http.StatusInternalServerError)
 			return
 		}
+
+		// Refresh the stored profile for known admins only.
+		upsertUser(db, userID,
+			params["username"],
+			params["first_name"],
+			params["last_name"],
+			"",
+			false,
+			false,
+		)
 
 		// Create session.
 		token, err := generateSessionToken()

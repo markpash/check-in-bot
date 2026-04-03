@@ -137,9 +137,51 @@
     .msg-unread { background: #1a1f26; }
     .clickable-row { cursor: pointer; }
     .clickable-row:hover td { background: #242424; }
-    .login-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; }
-    .login-page h1 { font-size: 24px; }
-    .login-error { color: var(--danger-text); font-size: 14px; }
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+    .login-shell {
+      width: 100%;
+      max-width: 420px;
+    }
+    .login-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      padding: 28px;
+      min-height: 280px;
+    }
+    .login-panel h2 {
+      font-size: 30px;
+      margin: 0;
+    }
+    .login-copy {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .login-widget-wrap {
+      padding-top: 6px;
+      min-height: 64px;
+    }
+    .login-dev-button {
+      align-self: flex-start;
+      padding: 10px 18px;
+      font-size: 15px;
+    }
+    .login-error {
+      color: var(--danger-text);
+      font-size: 14px;
+      background: rgba(120, 36, 36, 0.18);
+      border: 1px solid rgba(164, 72, 72, 0.35);
+      border-radius: 4px;
+      padding: 10px 12px;
+    }
     .toggle { cursor: pointer; user-select: none; }
     .time { color: var(--muted); font-size: 13px; }
     .note-editor { display: flex; gap: 8px; align-items: flex-start; }
@@ -328,6 +370,7 @@
       .meta-row { grid-template-columns: 1fr; gap: 4px; }
       .note-editor { flex-direction: column; }
       .msg-body { max-width: none; }
+      .login-panel { min-height: 0; padding: 22px; }
     }
   </style>
 </head>
